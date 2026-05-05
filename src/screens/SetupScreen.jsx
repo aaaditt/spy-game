@@ -10,8 +10,11 @@ export default function SetupScreen() {
   const updateSettings = useGameStore((s) => s.updateSettings)
   const startGame = useGameStore((s) => s.startGame)
   const setScreen = useGameStore((s) => s.setScreen)
+  const toggleWord = useGameStore((s) => s.toggleWord)
+  const toggleAllWords = useGameStore((s) => s.toggleAllWords)
 
   const [newPlayerName, setNewPlayerName] = useState('')
+  const [expandedCategory, setExpandedCategory] = useState(null)
 
   const handleAddPlayer = (e) => {
     e.preventDefault()
@@ -161,17 +164,61 @@ export default function SetupScreen() {
           <div className="category-grid">
             {Object.entries(WORD_BANK).map(([key, cat]) => {
               const isActive = isAllCategories || settings.selectedCategories.includes(key)
+              const disabledCount = settings.disabledWords[key]?.length || 0
+              const totalCount = cat.entries.length
+              const activeCount = totalCount - disabledCount
+              
               return (
-                <button
-                  key={key}
-                  className={`category-card ${isActive ? 'active' : ''}`}
-                  onClick={() => toggleCategory(key)}
-                >
-                  {cat.label}
-                </button>
+                <div key={key} className={`category-card-wrapper ${isActive ? 'active' : ''}`}>
+                  <button
+                    className={`category-card ${isActive ? 'active' : ''}`}
+                    onClick={() => toggleCategory(key)}
+                  >
+                    <span className="category-emoji">{cat.emoji}</span>
+                    <span className="category-label">{cat.label}</span>
+                    <span className="category-count">{activeCount}/{totalCount} words</span>
+                  </button>
+                  <button 
+                    className="category-expand-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setExpandedCategory(expandedCategory === key ? null : key)
+                    }}
+                    aria-label="Toggle word list"
+                  >
+                    {expandedCategory === key ? '▲' : '▼'}
+                  </button>
+                </div>
               )
             })}
           </div>
+
+          {expandedCategory && WORD_BANK[expandedCategory] && (
+            <div className="word-list-panel animate-slide-down">
+              <div className="word-list-header">
+                <h4>{WORD_BANK[expandedCategory].label} Words</h4>
+                <div className="word-list-actions">
+                  <button className="btn btn-ghost btn-sm" onClick={() => toggleAllWords(expandedCategory, true)}>Select All</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => toggleAllWords(expandedCategory, false)}>Deselect All</button>
+                </div>
+              </div>
+              <div className="word-chip-grid">
+                {WORD_BANK[expandedCategory].entries.map(entry => {
+                  const isWordDisabled = settings.disabledWords[expandedCategory]?.includes(entry.id)
+                  return (
+                    <label key={entry.id} className={`word-chip ${!isWordDisabled ? 'active' : 'disabled'}`}>
+                      <input 
+                        type="checkbox" 
+                        checked={!isWordDisabled}
+                        onChange={() => toggleWord(expandedCategory, entry.id)}
+                      />
+                      {entry.word}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </section>
 
         <div className="setup-spacer" aria-hidden="true" />
@@ -180,7 +227,7 @@ export default function SetupScreen() {
       <footer className="setup-footer animate-slide-up">
         <button
           className="btn btn-primary btn-lg setup-start-btn"
-          disabled={players.length < 3}
+          disabled={players.length < 3 || (!isAllCategories && settings.selectedCategories.length === 0)}
           onClick={startGame}
         >
           Start Game

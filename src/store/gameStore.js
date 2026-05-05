@@ -309,4 +309,27 @@ export const useGameStore = create((set, get) => ({
 
   // Full reset — returns to the initial home screen
   resetGame: () => set({ ...INITIAL_STATE }),
+
+  // Play Again — keeps same players & settings, zeroes scores, starts fresh
+  playAgain: () => {
+    const { players, settings } = get()
+    const { numSpies, selectedCategories, hintLevel } = settings
+
+    const entry = pickRandomEntry(selectedCategories)
+    if (!entry || players.length < 2) return
+
+    const resetPlayers    = players.map(p => ({ ...p, score: 0, role: null, votedFor: null }))
+    const assignedPlayers = assignRoles(resetPlayers, Math.min(numSpies, players.length - 1))
+
+    set({
+      players: assignedPlayers,
+      secretWord: entry.word,
+      spyHint: hintLevel === 'none' ? null : (entry.hints[hintLevel] ?? entry.hints.intermediate),
+      currentRound: 1,
+      currentRevealIndex: 0,
+      votes: {},
+      roundResults: [],
+      screen: 'reveal',
+    })
+  },
 }))

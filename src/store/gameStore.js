@@ -37,21 +37,18 @@ function assignRoles(players, numSpies) {
 // ─── Initial State ────────────────────────────────────────────────
 const INITIAL_STATE = {
   screen: 'home',
-  players: [],
   settings: {
     numSpies: 1,
-    rounds: 3,
     timerMinutes: 5,
     hintLevel: 'beginner',
     selectedCategories: [],
     disabledWords: {}, // { categoryId: [wordId1, wordId2] }
   },
-  currentRound: 0,
   currentRevealIndex: -1,
   secretWord: null,
   spyHint: null,
   votes: {},
-  roundResults: [],
+  roundResults: [], // Used for tracking voting and spy guess within the single game
 }
 
 // ─── Store ────────────────────────────────────────────────────────
@@ -68,7 +65,7 @@ export const useGameStore = create((set, get) => ({
     set(state => ({
       players: [
         ...state.players,
-        { id: generateId(), name: trimmed, role: null, score: 0, votedFor: null },
+        { id: generateId(), name: trimmed, role: null, votedFor: null },
       ],
     }))
   },
@@ -127,7 +124,6 @@ export const useGameStore = create((set, get) => ({
       players: assignedPlayers,
       secretWord: entry.word,
       spyHint: hintLevel === 'none' ? null : (entry.hints[hintLevel] ?? entry.hints.intermediate),
-      currentRound: 1,
       currentRevealIndex: 0,
       votes: {},
       roundResults: [],
@@ -175,18 +171,10 @@ export const useGameStore = create((set, get) => ({
 
     const spyVotedOut = votedOut?.role === 'spy'
 
-    // +2 pts to the "winning" side
-    const updatedPlayers = players.map(p => {
-      if (spyVotedOut  && p.role === 'innocent') return { ...p, score: p.score + 2 }
-      if (!spyVotedOut && p.role === 'spy')      return { ...p, score: p.score + 2 }
-      return p
-    })
-
     set(state => ({
-      players: updatedPlayers,
       roundResults: [
         ...state.roundResults,
-        { round: currentRound, type: 'vote', votedOut, spyVotedOut },
+        { type: 'vote', votedOut, spyVotedOut },
       ],
       screen: 'results',
     }))
@@ -194,23 +182,14 @@ export const useGameStore = create((set, get) => ({
     return votedOut
   },
 
-  // Spy attempts to name the secret word after being voted out
-  // Returns true if correct; awards 3 pts to spies on hit, 1 pt to innocents on miss
   spyGuess: (word) => {
-    const { secretWord, players, currentRound } = get()
+    const { secretWord } = get()
     const correct = word.trim().toLowerCase() === secretWord.toLowerCase()
 
-    const updatedPlayers = players.map(p => {
-      if (correct  && p.role === 'spy')      return { ...p, score: p.score + 3 }
-      if (!correct && p.role === 'innocent') return { ...p, score: p.score + 1 }
-      return p
-    })
-
     set(state => ({
-      players: updatedPlayers,
       roundResults: [
         ...state.roundResults,
-        { round: currentRound, type: 'spyGuess', guessedWord: word.trim(), secretWord, correct },
+        { type: 'spyGuess', guessedWord: word.trim(), secretWord, correct },
       ],
       screen: 'results',
     }))
@@ -218,32 +197,9 @@ export const useGameStore = create((set, get) => ({
     return correct
   },
 
-  // Advance to the next round; if all rounds complete, go to 'final'
+  // Proceed to final screen
   nextRound: () => {
-    const { currentRound, settings, players } = get()
-    const { rounds, numSpies, selectedCategories, hintLevel, disabledWords } = settings
-
-    if (currentRound >= rounds) {
-      set({ screen: 'final' })
-      return
-    }
-
-    const entry = pickRandomEntry(selectedCategories, disabledWords)
-    if (!entry) return
-
-    // Keep scores; clear per-round role and vote state
-    const resetPlayers    = players.map(p => ({ ...p, role: null, votedFor: null }))
-    const assignedPlayers = assignRoles(resetPlayers, Math.min(numSpies, players.length - 1))
-
-    set({
-      players: assignedPlayers,
-      secretWord: entry.word,
-      spyHint: hintLevel === 'none' ? null : (entry.hints[hintLevel] ?? entry.hints.intermediate),
-      currentRound: currentRound + 1,
-      currentRevealIndex: 0,
-      votes: {},
-      screen: 'reveal',
-    })
+    set({ screen: 'final' })
   },
 
   // Full reset — returns to the initial home screen
@@ -257,14 +213,13 @@ export const useGameStore = create((set, get) => ({
     const entry = pickRandomEntry(selectedCategories, disabledWords)
     if (!entry || players.length < 2) return
 
-    const resetPlayers    = players.map(p => ({ ...p, score: 0, role: null, votedFor: null }))
+    const resetPlayers    = players.map(p => ({ ...p, role: null, votedFor: null }))
     const assignedPlayers = assignRoles(resetPlayers, Math.min(numSpies, players.length - 1))
 
     set({
       players: assignedPlayers,
       secretWord: entry.word,
       spyHint: hintLevel === 'none' ? null : (entry.hints[hintLevel] ?? entry.hints.intermediate),
-      currentRound: 1,
       currentRevealIndex: 0,
       votes: {},
       roundResults: [],

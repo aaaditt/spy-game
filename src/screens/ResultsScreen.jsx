@@ -230,50 +230,7 @@ function SpyGuessInput({ secretWord, spyGuess }) {
   )
 }
 
-/**
- * Score leaderboard — shown after results are fully revealed.
- */
-function ScoreBoard({ players }) {
-  const sorted = [...players].sort((a, b) => b.score - a.score)
-  const maxScore = sorted[0]?.score ?? 0
 
-  return (
-    <section className="rs-scores" aria-label="Current scores">
-      <h3 className="rs-scores-title">Scores</h3>
-      <div className="rs-scores-list" role="list">
-        {sorted.map((player, i) => {
-          const initials = player.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
-          const pct      = maxScore > 0 ? (player.score / maxScore) * 100 : 0
-          const medal    = i === 0 && player.score > 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
-
-          return (
-            <div
-              key={player.id}
-              className={`rs-score-row animate-fade-in ${i === 0 && player.score > 0 ? 'rs-score-row-leader' : ''}`}
-              style={{ animationDelay: `${i * 60}ms` }}
-              role="listitem"
-            >
-              <span className="rs-score-rank">{medal ?? `${i + 1}`}</span>
-              <div className="rs-score-avatar">{initials}</div>
-              <div className="rs-score-info">
-                <span className="rs-score-name">{player.name}</span>
-                <div className="rs-score-track">
-                  <div
-                    className={`rs-score-bar ${i === 0 && player.score > 0 ? 'rs-score-bar-leader' : ''}`}
-                    style={{ width: `${Math.max(pct, player.score > 0 ? 5 : 0)}%` }}
-                  />
-                </div>
-              </div>
-              <span className="rs-score-pts">
-                {player.score} <span className="rs-score-pts-label">pts</span>
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    </section>
-  )
-}
 
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
@@ -282,7 +239,6 @@ export default function ResultsScreen() {
   const votes         = useGameStore((s) => s.votes)
   const roundResults  = useGameStore((s) => s.roundResults)
   const secretWord    = useGameStore((s) => s.secretWord)
-  const currentRound  = useGameStore((s) => s.currentRound)
   const settings      = useGameStore((s) => s.settings)
   const nextRound     = useGameStore((s) => s.nextRound)
   const spyGuessFn    = useGameStore((s) => s.spyGuess)
@@ -302,7 +258,6 @@ export default function ResultsScreen() {
   const [revealDone, setRevealDone]     = useState(false)
 
   const tallyMap   = buildTallyMap(players, votes)
-  const isLastRound = currentRound >= settings.rounds
 
   // When spy reveal fires the callback, we may show the spy guess input
   function handleSpyGuessPhase() {
@@ -342,7 +297,7 @@ export default function ResultsScreen() {
         <div className="rs-header-badge">
           <span>📋</span>
           <span>
-            Round <strong>{currentRound}</strong> Results
+            Voting Results
           </span>
         </div>
       </header>
@@ -409,21 +364,13 @@ export default function ResultsScreen() {
           </div>
         )}
 
-        {/* 5. Scoreboard — revealed after spy verdict */}
-        {revealDone && (
-          <section className="rs-section animate-slide-up" aria-label="Score update">
-            <ScoreBoard players={players} />
-          </section>
-        )}
 
         {/* Spacer so footer doesn't cover content */}
         <div className="rs-body-spacer" />
       </div>
 
       {/* ── Footer CTA ── */}
-      {revealDone && (
         <footer className="rs-footer animate-slide-up">
-          {isLastRound ? (
             <button
               id="btn-view-final-scores"
               className="rs-cta-btn rs-cta-btn-final"
@@ -431,21 +378,9 @@ export default function ResultsScreen() {
               aria-label="View final scores"
             >
               <span>🏆</span>
-              View Final Scores
+              View Final Results
             </button>
-          ) : (
-            <button
-              id="btn-next-round"
-              className="rs-cta-btn rs-cta-btn-next"
-              onClick={nextRound}
-              aria-label={`Start round ${currentRound + 1}`}
-            >
-              <span>▶</span>
-              Next Round
-            </button>
-          )}
         </footer>
-      )}
 
     </main>
   )

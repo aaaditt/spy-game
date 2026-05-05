@@ -55,65 +55,28 @@ function Confetti() {
  * Individual player ranking card.
  * rank 0 = winner → glowing border + confetti.
  */
-function PlayerCard({ player, rank, maxScore, animDelay }) {
-  const [barAnimated, setBarAnimated] = useState(false)
-  const isWinner   = rank === 0
-  const hasTrophy  = rank < 3
-  const pct        = maxScore > 0 ? (player.score / maxScore) * 100 : 0
-  const initials   = getInitials(player.name)
-
-  // Animate bar after mount
-  useEffect(() => {
-    const t = setTimeout(() => setBarAnimated(true), animDelay + 100)
-    return () => clearTimeout(t)
-  }, [animDelay])
+function PlayerCard({ player, isWinnerTeam, animDelay }) {
+  const initials = getInitials(player.name)
+  const roleEmoji = player.role === 'spy' ? '🕵️' : '🛡️'
+  const roleName = player.role === 'spy' ? 'Spy' : 'Crewmate'
 
   return (
     <div
-      className={`sb-card animate-fade-in ${isWinner ? 'sb-card-winner' : ''}`}
+      className={`sb-card animate-fade-in ${isWinnerTeam ? 'sb-card-winner' : ''}`}
       style={{ animationDelay: `${animDelay}ms` }}
       role="listitem"
-      aria-label={`${player.name} – ${player.score} points – rank ${rank + 1}`}
     >
-      {/* Confetti burst for winner */}
-      {isWinner && player.score > 0 && <Confetti />}
-
-      {/* Rank badge */}
-      <div className={`sb-rank ${hasTrophy ? 'sb-rank-trophy' : ''}`}>
-        {hasTrophy ? TROPHY[rank] : <span className="sb-rank-num">{rank + 1}</span>}
-      </div>
-
-      {/* Avatar */}
-      <div className={`sb-avatar ${isWinner ? 'sb-avatar-winner' : ''}`}>
+      <div className={`sb-avatar ${isWinnerTeam ? 'sb-avatar-winner' : ''}`}>
         {initials}
       </div>
 
-      {/* Name + score bar */}
       <div className="sb-info">
-        <span className={`sb-name ${isWinner ? 'sb-name-winner' : ''}`}>
+        <span className={`sb-name ${isWinnerTeam ? 'sb-name-winner' : ''}`}>
           {player.name}
         </span>
-        <div
-          className="sb-track"
-          role="progressbar"
-          aria-valuenow={player.score}
-          aria-valuemin={0}
-          aria-valuemax={maxScore || 1}
-          aria-label={`${player.score} points`}
-        >
-          <div
-            className={`sb-bar ${isWinner ? 'sb-bar-winner' : ''}`}
-            style={{ width: barAnimated ? `${Math.max(pct, player.score > 0 ? 4 : 0)}%` : '0%' }}
-          />
-        </div>
-      </div>
-
-      {/* Score */}
-      <div className="sb-score">
-        <span className={`sb-score-num ${isWinner ? 'sb-score-num-winner' : ''}`}>
-          {player.score}
+        <span className="sb-role" style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+          {roleEmoji} {roleName}
         </span>
-        <span className="sb-score-label">pts</span>
       </div>
     </div>
   )
@@ -128,13 +91,27 @@ export default function ScoreboardScreen() {
   const setScreen = useGameStore((s) => s.setScreen)
   const resetGame = useGameStore((s) => s.resetGame)
 
-  const sorted   = [...players].sort((a, b) => b.score - a.score)
-  const maxScore = sorted[0]?.score ?? 0
-  const winner   = sorted[0] ?? null
-  const isTie    = sorted.length > 1 && sorted[0].score === sorted[1].score
+  const roundResults = useGameStore((s) => s.roundResults)
+  
+  const voteResult = roundResults.find(r => r.type === 'vote')
+  const guessResult = roundResults.find(r => r.type === 'spyGuess')
+
+  let spyWins = false;
+  if (voteResult && !voteResult.spyVotedOut) {
+    spyWins = true;
+  } else if (guessResult && guessResult.correct) {
+    spyWins = true;
+  }
+
+  const winnerTitle = spyWins ? 'Spy Wins! 🕵️' : 'Crewmates Win! 🛡️'
+  const winnerSubtitle = spyWins 
+    ? (guessResult?.correct ? 'The Spy guessed the secret word!' : 'The Spy escaped the vote!')
+    : 'The Spy was caught and failed to guess the word!'
 
   return (
     <main className="sb-screen">
+
+      <Confetti />
 
       {/* ── Ambient background ── */}
       <div className="sb-bg" aria-hidden="true">
@@ -148,17 +125,13 @@ export default function ScoreboardScreen() {
         <div className="sb-header-inner">
           <div className="sb-header-badge">
             <span>🏆</span>
-            <span>Final Scoreboard</span>
+            <span>Final Results</span>
           </div>
           <h1 className="sb-headline">
-            {isTie
-              ? "It's a Tie! 🤝"
-              : winner
-              ? `${winner.name} Wins! 🎉`
-              : 'Game Over'}
+            {winnerTitle}
           </h1>
           <p className="sb-sub">
-            {settings.rounds} round{settings.rounds !== 1 ? 's' : ''} complete
+            {winnerSubtitle}
           </p>
         </div>
       </header>
@@ -169,15 +142,17 @@ export default function ScoreboardScreen() {
         aria-label="Final rankings"
         role="list"
       >
-        {sorted.map((player, i) => (
-          <PlayerCard
-            key={player.id}
-            player={player}
-            rank={i}
-            maxScore={maxScore}
-            animDelay={i * 80}
-          />
-        ))}
+        {players.map((player, i) => {
+          const isWinnerTeam = spyWins ? player.role === 'spy' : player.role === 'innocent';
+          return (
+            <PlayerCard
+              key={player.id}
+              player={player}
+              isWinnerTeam={isWinnerTeam}
+              animDelay={i * 80}
+            />
+          )
+        })}
 
         {/* Spacer so footer doesn't occlude last card */}
         <div className="sb-body-spacer" aria-hidden="true" />

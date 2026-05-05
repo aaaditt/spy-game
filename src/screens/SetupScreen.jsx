@@ -108,20 +108,6 @@ export default function SetupScreen() {
             </div>
           </div>
 
-          <div className="setting-row">
-            <span className="setting-label">Rounds</span>
-            <div className="pill-group">
-              {[1, 2, 3, 5].map((n) => (
-                <button
-                  key={n}
-                  className={`pill ${settings.rounds === n ? 'active' : ''}`}
-                  onClick={() => updateSettings({ rounds: n })}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="setting-row">
             <span className="setting-label">Timer (Mins)</span>

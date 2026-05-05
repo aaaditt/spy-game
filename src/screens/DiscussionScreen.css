@@ -1,0 +1,355 @@
+/* ─── DiscussionScreen ───────────────────────────────────────────── */
+
+/* Slide-down animation for header */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slideDown var(--transition-slow) both;
+}
+
+/* CTA glow-pulse when timer has expired */
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow: var(--shadow-md), 0 0 18px rgba(139, 92, 246, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: var(--shadow-lg), 0 0 40px rgba(139, 92, 246, 0.75);
+    transform: scale(1.025);
+  }
+}
+
+/* ── Shell ── */
+.ds-screen {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  padding-bottom: var(--space-8);
+}
+
+/* ── Background orbs ── */
+.ds-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ds-orb {
+  position: absolute;
+  border-radius: var(--radius-full);
+  filter: blur(90px);
+  opacity: 0.15;
+}
+
+.ds-orb-1 {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  top: -140px;
+  left: -120px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.ds-orb-2 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #ec4899, transparent 70%);
+  bottom: -100px;
+  right: -80px;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+.ds-orb-3 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, #a855f7, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: float 12s ease-in-out infinite 2s;
+}
+
+/* ── Header ── */
+.ds-header {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-5) var(--space-6) var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+/* ── Round badge ── */
+.ds-round-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+}
+
+.ds-round-badge-icon {
+  font-size: 0.9rem;
+}
+
+.ds-round-badge-text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.01em;
+}
+
+.ds-round-badge-text strong {
+  color: var(--color-accent-1);
+  font-weight: 700;
+}
+
+.ds-round-badge-total {
+  color: var(--color-text-muted);
+}
+
+/* ── Body ── */
+.ds-body {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+/* ── Category section ── */
+.ds-category-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-category-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.ds-category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+}
+
+.ds-category-icon {
+  font-size: 1rem;
+}
+
+.ds-category-label {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  letter-spacing: -0.01em;
+}
+
+/* ── Timer section ── */
+.ds-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds-timer-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 260px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Players section ── */
+.ds-players-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ds-players-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.ds-players-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+/* ── Player chip ── */
+.ds-player-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-spring);
+  cursor: default;
+}
+
+.ds-player-chip:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.ds-player-chip-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+.ds-player-chip-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Footer / CTA ── */
+.ds-footer {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.ds-vote-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background: var(--gradient-accent);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+}
+
+.ds-vote-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  border-radius: inherit;
+}
+
+.ds-vote-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.ds-vote-btn:hover::before { opacity: 1; }
+
+.ds-vote-btn:active {
+  transform: scale(0.97);
+}
+
+.ds-vote-btn:focus-visible {
+  outline: 2px solid var(--color-accent-1);
+  outline-offset: 3px;
+}
+
+/* Pulse animation once timer expires */
+.ds-vote-btn-pulse {
+  animation: ctaPulse 1.5s ease-in-out infinite;
+}
+
+.ds-vote-btn-icon {
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+/* "Skip timer" secondary label inside button */
+.ds-vote-btn-skip {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.72;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ── Responsive tweaks ── */
+@media (max-height: 700px) {
+  .ds-body { gap: var(--space-5); }
+  .ds-timer-wrap { gap: var(--space-2); }
+}
+
+@media (min-width: 480px) {
+  .ds-player-chip-name { max-width: 160px; }
+}

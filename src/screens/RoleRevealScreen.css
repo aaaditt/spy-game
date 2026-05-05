@@ -1,0 +1,573 @@
+/* ─── RoleRevealScreen ────────────────────────────────────────────── */
+
+/* ── Layout shell ── */
+.rr-screen {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+/* ── Top progress header ── */
+.rr-header {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.rr-header-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.rr-header-count {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Progress dots ── */
+.rr-progress {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.rr-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background var(--transition-base), transform var(--transition-spring);
+}
+
+.rr-progress-dot-done {
+  background: var(--color-accent-1);
+  border-color: var(--color-accent-1);
+}
+
+.rr-progress-dot-active {
+  background: var(--color-accent-2);
+  border-color: var(--color-accent-2);
+  transform: scale(1.3);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COVER SCREEN
+   ═══════════════════════════════════════════════════════════════════ */
+
+.rr-cover {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Ambient background */
+.rr-cover-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rr-cover-orb {
+  position: absolute;
+  border-radius: var(--radius-full);
+  filter: blur(80px);
+  opacity: 0.18;
+}
+
+.rr-cover-orb-1 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  top: -80px;
+  right: -100px;
+  animation: float 7s ease-in-out infinite;
+}
+
+.rr-cover-orb-2 {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, #ec4899, transparent 70%);
+  bottom: -60px;
+  left: -80px;
+  animation: float 9s ease-in-out infinite reverse;
+}
+
+/* Cover content card */
+.rr-cover-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-8);
+  width: 100%;
+  max-width: 380px;
+}
+
+.rr-cover-icon {
+  font-size: 3rem;
+  line-height: 1;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+}
+
+.rr-cover-label {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin: 0;
+}
+
+.rr-cover-name {
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #f0f2ff 0%, #8b5cf6 60%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+
+.rr-cover-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Reveal button */
+.rr-reveal-btn {
+  margin-top: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-10);
+  background: var(--gradient-accent);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.rr-reveal-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  border-radius: inherit;
+}
+
+.rr-reveal-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: var(--shadow-lg), 0 0 32px var(--color-accent-glow);
+}
+
+.rr-reveal-btn:hover::before { opacity: 1; }
+
+.rr-reveal-btn:active {
+  transform: scale(0.97);
+}
+
+.rr-reveal-btn-icon {
+  font-size: 1.1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3-D FLIP CARD
+   ═══════════════════════════════════════════════════════════════════ */
+
+.rr-card-area {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+}
+
+.rr-flip-scene {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 2 / 3;
+}
+
+.rr-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.rr-flip-scene-done .rr-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.rr-flip-front,
+.rr-flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* ── Flip front: card-back texture ── */
+.rr-flip-front-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(139, 92, 246, 0.25), transparent 60%),
+    radial-gradient(ellipse at 70% 70%, rgba(236, 72, 153, 0.2), transparent 60%),
+    var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-xl);
+}
+
+.rr-flip-front-icon {
+  font-size: 5rem;
+  filter: drop-shadow(0 0 24px rgba(139, 92, 246, 0.6));
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Flip back: the reveal ── */
+.rr-flip-back {
+  transform: rotateY(180deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ROLE CARDS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.rr-card {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Shared shine overlay */
+.rr-card-shine {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Card body layout */
+.rr-card-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+}
+
+/* Role badge pill */
+.rr-card-badge {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.25em 0.9em;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-1);
+}
+
+/* Role icon */
+.rr-card-role-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: var(--space-1);
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+}
+
+/* Category row */
+.rr-card-category {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--space-1);
+}
+
+.rr-card-category-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.rr-card-category-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Tip text at bottom */
+.rr-card-tip {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.7;
+  max-width: 220px;
+  margin-top: var(--space-2);
+}
+
+/* ── CREWMATE card ── */
+.rr-card-crewmate {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(52, 211, 153, 0.35), transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.25), transparent 55%),
+    linear-gradient(160deg, #0d2b22 0%, #0a1f18 50%, #061411 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.12) inset,
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(52, 211, 153, 0.12);
+}
+
+.crewmate-badge {
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+}
+
+.crewmate-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(110, 231, 183, 0.75);
+  margin: 0;
+}
+
+.crewmate-word {
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-shadow:
+    0 0 20px rgba(52, 211, 153, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  margin: var(--space-1) 0;
+  line-height: 1.1;
+}
+
+.rr-card-crewmate .rr-card-category-label { color: rgba(110, 231, 183, 0.6); }
+.rr-card-crewmate .rr-card-category-value { color: #a7f3d0; }
+.crewmate-tip { color: rgba(110, 231, 183, 0.65); }
+
+/* ── SPY card ── */
+.rr-card-spy {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(239, 68, 68, 0.35), transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(185, 28, 28, 0.3), transparent 55%),
+    linear-gradient(160deg, #2a0a0a 0%, #1c0606 50%, #130404 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.12) inset,
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(239, 68, 68, 0.15);
+}
+
+.spy-badge {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.rr-card-spy-title {
+  font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-shadow:
+    0 0 24px rgba(239, 68, 68, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1.1;
+  margin-bottom: var(--space-2);
+}
+
+.rr-spy-hint-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  max-width: 240px;
+  width: 100%;
+}
+
+.rr-spy-hint-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(252, 165, 165, 0.65);
+  margin: 0 0 var(--space-1);
+}
+
+.rr-spy-hint-text {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: #fecaca;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.rr-spy-no-hint {
+  font-size: 0.8125rem;
+  color: rgba(252, 165, 165, 0.6);
+  font-style: italic;
+  max-width: 200px;
+  margin: 0;
+}
+
+.spy-tip { color: rgba(252, 165, 165, 0.6); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CTA SECTION (below the card after reveal)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.rr-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 340px;
+}
+
+.rr-cta-player-name {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.rr-cta-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+}
+
+.rr-cta-btn:active {
+  transform: scale(0.96);
+}
+
+/* "Got it!" — secondary style */
+.rr-cta-btn-gotit {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.rr-cta-btn-gotit:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: var(--color-border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* "Start Discussion" — accent style */
+.rr-cta-btn-start {
+  background: var(--gradient-accent);
+  color: #ffffff;
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.rr-cta-btn-start::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.rr-cta-btn-start:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-lg), 0 0 32px var(--color-accent-glow);
+}
+
+.rr-cta-btn-start:hover::before { opacity: 1; }
+
+/* ─── Responsive tweaks ───────────────────────────────────────────── */
+@media (max-height: 700px) {
+  .rr-cover-content {
+    padding: var(--space-6) var(--space-6);
+    gap: var(--space-3);
+  }
+
+  .rr-cover-icon { font-size: 2.2rem; }
+  .rr-flip-scene { max-width: 280px; }
+  .rr-card-body  { gap: var(--space-2); padding: var(--space-4); }
+}
+
+@media (min-width: 480px) {
+  .rr-flip-scene { max-width: 380px; }
+}

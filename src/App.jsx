@@ -1,11 +1,13 @@
 import { useGameStore } from './store/gameStore'
 import HomeScreen from './screens/HomeScreen'
+import RoleRevealScreen from './screens/RoleRevealScreen'
 import './App.css'
 
-// Lazy-import placeholders for future screens — swap these in as they're built
+// Screens registered here are rendered by the store's `screen` key
 const SCREENS = {
-  home: HomeScreen,
-  // setup, reveal, play, vote, results, final — to be added
+  home:   HomeScreen,
+  reveal: RoleRevealScreen,
+  // setup, play, vote, results, final — to be added
 }
 
 function App() {

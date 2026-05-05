@@ -1,0 +1,494 @@
+/* ═══════════════════════════════════════════════════════════════════
+   VotingScreen.css
+   Scoped to .vs-* prefix to avoid conflicts with other screens.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Cover Screen ──────────────────────────────────────────────────── */
+
+.vs-cover {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+/* Ambient orbs */
+.vs-cover-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.vs-cover-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+}
+
+.vs-cover-orb-1 {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, var(--color-accent-1), transparent 70%);
+  top: -120px;
+  left: -80px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.vs-cover-orb-2 {
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, var(--color-accent-2), transparent 70%);
+  bottom: -80px;
+  right: -60px;
+  animation: float 11s ease-in-out infinite reverse;
+}
+
+/* Cover content */
+.vs-cover-content {
+  position: relative;
+  z-index: var(--z-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+}
+
+.vs-cover-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.5));
+  animation: float 4s ease-in-out infinite;
+}
+
+.vs-cover-eyebrow {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.vs-cover-name {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.vs-cover-hint {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Progress badge (shared between cover + voting) */
+.vs-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.vs-progress-icon { font-size: 1rem; }
+
+.vs-progress-text strong {
+  color: var(--color-accent-1);
+}
+
+/* Cover CTA button */
+.vs-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-10);
+  background: var(--gradient-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--space-4);
+}
+
+.vs-start-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.vs-start-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.vs-start-btn:hover::before { opacity: 1; }
+.vs-start-btn:active { transform: scale(0.97); }
+
+.vs-start-btn-icon { font-size: 1.1rem; }
+
+/* ── Voting Screen ─────────────────────────────────────────────────── */
+
+.vs-screen {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+/* Background orbs */
+.vs-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.vs-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+}
+
+.vs-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--color-accent-3), transparent 70%);
+  top: -200px;
+  right: -150px;
+}
+
+.vs-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--color-accent-2), transparent 70%);
+  bottom: -100px;
+  left: -100px;
+}
+
+/* ── Header ── */
+.vs-header {
+  position: relative;
+  z-index: var(--z-raised);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(10, 11, 20, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.vs-header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.vs-header-voter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-strong);
+}
+
+.vs-header-voter-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.vs-header-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Body ── */
+.vs-body {
+  position: relative;
+  z-index: var(--z-raised);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-5) 0;
+  overflow-y: auto;
+}
+
+.vs-instruction {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ── Player Grid ── */
+.vs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+}
+
+/* Player card */
+.vs-player-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  background: rgba(15, 16, 32, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition:
+    transform var(--transition-spring),
+    background var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  user-select: none;
+  min-height: 130px;
+}
+
+/* Shine overlay */
+.vs-player-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.vs-player-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-accent);
+  box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+}
+
+.vs-player-card:hover::before { opacity: 1; }
+.vs-player-card:active { transform: scale(0.97); }
+
+/* Selected state */
+.vs-player-card-selected {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--color-accent-1);
+  box-shadow: var(--shadow-glow), 0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+
+.vs-player-card-selected::before { opacity: 1; }
+
+/* Selection ring animation */
+.vs-card-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 2px solid var(--color-accent-1);
+  animation: pulseGlow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Avatar circle */
+.vs-card-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: rgba(139, 92, 246, 0.15);
+  border: 1.5px solid var(--color-border-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--color-accent-1);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base);
+  flex-shrink: 0;
+}
+
+.vs-player-card-selected .vs-card-avatar {
+  background: var(--gradient-accent);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--shadow-glow-sm);
+}
+
+/* Player name */
+.vs-card-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Checkmark badge */
+.vs-card-check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Footer ── */
+.vs-footer {
+  position: relative;
+  z-index: var(--z-raised);
+  padding: var(--space-4) var(--space-5) var(--space-6);
+  background: rgba(10, 11, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Confirm button */
+.vs-confirm-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base),
+    background var(--transition-base),
+    opacity var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.vs-confirm-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+/* Ready (player selected) */
+.vs-confirm-btn-ready {
+  background: var(--gradient-accent);
+  color: #fff;
+  box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+.vs-confirm-btn-ready:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.vs-confirm-btn-ready:hover::before { opacity: 1; }
+.vs-confirm-btn-ready:active { transform: scale(0.97); }
+
+/* Disabled (no selection) */
+.vs-confirm-btn-disabled {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (min-width: 480px) {
+  .vs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (min-width: 640px) {
+  .vs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .vs-player-card {
+    padding: var(--space-6) var(--space-5);
+    min-height: 150px;
+  }
+
+  .vs-card-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
+}

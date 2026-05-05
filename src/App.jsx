@@ -2,6 +2,7 @@ import { useGameStore } from './store/gameStore'
 import HomeScreen from './screens/HomeScreen'
 import RoleRevealScreen from './screens/RoleRevealScreen'
 import DiscussionScreen from './screens/DiscussionScreen'
+import VotingScreen from './screens/VotingScreen'
 import './App.css'
 
 // Screens registered here are rendered by the store's `screen` key
@@ -9,7 +10,8 @@ const SCREENS = {
   home:   HomeScreen,
   reveal: RoleRevealScreen,
   play:   DiscussionScreen,
-  // vote, results, final — to be added
+  vote:   VotingScreen,
+  // results, final — to be added
 }
 
 function App() {

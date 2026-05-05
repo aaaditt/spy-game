@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+export { WORD_BANK } from '../data/categories.js'
 
 import { WORD_BANK } from '../data/categories.js'
 

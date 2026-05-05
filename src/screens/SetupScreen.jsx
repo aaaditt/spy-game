@@ -52,7 +52,7 @@ export default function SetupScreen() {
       </header>
 
       <div className="setup-body">
-        
+
         {/* Players Section */}
         <section className="setup-section glass-card animate-fade-in stagger-1">
           <div className="setup-section-header">
@@ -72,13 +72,13 @@ export default function SetupScreen() {
               Add
             </button>
           </form>
-          
+
           <div className="player-list">
             {players.map((p) => (
               <div key={p.id} className="player-item animate-scale-in">
                 <span className="player-name">{p.name}</span>
-                <button 
-                  className="btn-remove" 
+                <button
+                  className="btn-remove"
                   onClick={() => removePlayer(p.id)}
                   aria-label={`Remove ${p.name}`}
                 >
@@ -92,7 +92,7 @@ export default function SetupScreen() {
         {/* Settings Section */}
         <section className="setup-section glass-card animate-fade-in stagger-2">
           <h3 className="setup-section-title">Game Rules</h3>
-          
+
           <div className="setting-row">
             <span className="setting-label">Number of Spies</span>
             <div className="pill-group">
@@ -108,6 +108,20 @@ export default function SetupScreen() {
             </div>
           </div>
 
+          <div className="setting-row">
+            <span className="setting-label">Rounds</span>
+            <div className="pill-group">
+              {[1, 2, 3, 5].map((n) => (
+                <button
+                  key={n}
+                  className={`pill ${settings.rounds === n ? 'active' : ''}`}
+                  onClick={() => updateSettings({ rounds: n })}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="setting-row">
             <span className="setting-label">Timer (Mins)</span>
@@ -153,7 +167,7 @@ export default function SetupScreen() {
               const disabledCount = settings.disabledWords[key]?.length || 0
               const totalCount = cat.entries.length
               const activeCount = totalCount - disabledCount
-              
+
               return (
                 <div key={key} className={`category-card-wrapper ${isActive ? 'active' : ''}`}>
                   <button
@@ -164,7 +178,7 @@ export default function SetupScreen() {
                     <span className="category-label">{cat.label}</span>
                     <span className="category-count">{activeCount}/{totalCount} words</span>
                   </button>
-                  <button 
+                  <button
                     className="category-expand-btn"
                     onClick={(e) => {
                       e.stopPropagation()
@@ -193,8 +207,8 @@ export default function SetupScreen() {
                   const isWordDisabled = settings.disabledWords[expandedCategory]?.includes(entry.id)
                   return (
                     <label key={entry.id} className={`word-chip ${!isWordDisabled ? 'active' : 'disabled'}`}>
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={!isWordDisabled}
                         onChange={() => toggleWord(expandedCategory, entry.id)}
                       />

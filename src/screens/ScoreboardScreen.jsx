@@ -17,12 +17,7 @@ const TROPHY = ['🥇', '🥈', '🥉']
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-/**
- * Confetti burst — 30 particles that animate out from centre then fade.
- * Rendered once over the winner card.
- */
 function Confetti() {
-  // 30 particles; angles spread 360°
   const particles = Array.from({ length: 30 }, (_, i) => ({
     id: i,
     angle: (i / 30) * 360,
@@ -51,10 +46,6 @@ function Confetti() {
   )
 }
 
-/**
- * Individual player ranking card.
- * rank 0 = winner → glowing border + confetti.
- */
 function PlayerCard({ player, rank, maxScore, animDelay }) {
   const [barAnimated, setBarAnimated] = useState(false)
   const isWinner = rank === 0
@@ -62,7 +53,6 @@ function PlayerCard({ player, rank, maxScore, animDelay }) {
   const pct = maxScore > 0 ? (player.score / maxScore) * 100 : 0
   const initials = getInitials(player.name)
 
-  // Animate bar after mount
   useEffect(() => {
     const t = setTimeout(() => setBarAnimated(true), animDelay + 100)
     return () => clearTimeout(t)
@@ -75,20 +65,16 @@ function PlayerCard({ player, rank, maxScore, animDelay }) {
       role="listitem"
       aria-label={`${player.name} – ${player.score} points – rank ${rank + 1}`}
     >
-      {/* Confetti burst for winner */}
       {isWinner && player.score > 0 && <Confetti />}
 
-      {/* Rank badge */}
       <div className={`sb-rank ${hasTrophy ? 'sb-rank-trophy' : ''}`}>
         {hasTrophy ? TROPHY[rank] : <span className="sb-rank-num">{rank + 1}</span>}
       </div>
 
-      {/* Avatar */}
       <div className={`sb-avatar ${isWinner ? 'sb-avatar-winner' : ''}`}>
         {initials}
       </div>
 
-      {/* Name + score bar */}
       <div className="sb-info">
         <span className={`sb-name ${isWinner ? 'sb-name-winner' : ''}`}>
           {player.name}
@@ -108,7 +94,6 @@ function PlayerCard({ player, rank, maxScore, animDelay }) {
         </div>
       </div>
 
-      {/* Score */}
       <div className="sb-score">
         <span className={`sb-score-num ${isWinner ? 'sb-score-num-winner' : ''}`}>
           {player.score}
@@ -122,16 +107,39 @@ function PlayerCard({ player, rank, maxScore, animDelay }) {
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function ScoreboardScreen() {
-  const players = useGameStore((s) => s.players)
-  const settings = useGameStore((s) => s.settings)
-  const playAgain = useGameStore((s) => s.playAgain)
-  const setScreen = useGameStore((s) => s.setScreen)
-  const resetGame = useGameStore((s) => s.resetGame)
+  const players        = useGameStore((s) => s.players)
+  const screen         = useGameStore((s) => s.screen)
+  const currentRound   = useGameStore((s) => s.currentRound)
+  const winner         = useGameStore((s) => s.winner)
+  const playAgain      = useGameStore((s) => s.playAgain)
+  const resetGame      = useGameStore((s) => s.resetGame)
+  const startNextRound = useGameStore((s) => s.startNextRound)
 
+  const isFinal = screen === 'final'
   const sorted = [...players].sort((a, b) => b.score - a.score)
   const maxScore = sorted[0]?.score ?? 0
-  const winner = sorted[0] ?? null
+  const topPlayer = sorted[0] ?? null
   const isTie = sorted.length > 1 && sorted[0].score === sorted[1].score
+
+  const headline = isFinal
+    ? (winner === 'spy'
+        ? '🕵️ Spy Wins!'
+        : winner === 'crewmates'
+          ? '🛡️ Crewmates Win!'
+          : isTie
+            ? "It's a Tie! 🤝"
+            : topPlayer
+              ? `${topPlayer.name} Wins! 🎉`
+              : 'Game Over')
+    : `Round ${currentRound} Complete`
+
+  const subline = isFinal
+    ? (winner === 'spy'
+        ? 'The spy survived to the end.'
+        : winner === 'crewmates'
+          ? 'The spy was found out.'
+          : 'Final standings')
+    : 'Scores so far — get ready for the next round'
 
   return (
     <main className="sb-screen">
@@ -147,26 +155,18 @@ export default function ScoreboardScreen() {
       <header className="sb-header animate-slide-down">
         <div className="sb-header-inner">
           <div className="sb-header-badge">
-            <span>🏆</span>
-            <span>Final Scoreboard</span>
+            <span>{isFinal ? '🏆' : '📊'}</span>
+            <span>{isFinal ? 'Final Scoreboard' : 'Scoreboard'}</span>
           </div>
-          <h1 className="sb-headline">
-            {isTie
-              ? "It's a Tie! 🤝"
-              : winner
-                ? `${winner.name} Wins! 🎉`
-                : 'Game Over'}
-          </h1>
-          <p className="sb-sub">
-            {settings.rounds} round{settings.rounds !== 1 ? 's' : ''} complete
-          </p>
+          <h1 className="sb-headline">{headline}</h1>
+          <p className="sb-sub">{subline}</p>
         </div>
       </header>
 
       {/* ── Rankings list ── */}
       <section
         className="sb-body"
-        aria-label="Final rankings"
+        aria-label={isFinal ? 'Final rankings' : 'Current scores'}
         role="list"
       >
         {sorted.map((player, i) => (
@@ -178,45 +178,43 @@ export default function ScoreboardScreen() {
             animDelay={i * 80}
           />
         ))}
-
-        {/* Spacer so footer doesn't occlude last card */}
         <div className="sb-body-spacer" aria-hidden="true" />
       </section>
 
       {/* ── Footer actions ── */}
       <footer className="sb-footer animate-slide-up">
-        {/* Play Again — same players + settings, reset round state */}
-        <button
-          id="btn-play-again"
-          className="sb-btn sb-btn-primary"
-          onClick={playAgain}
-          aria-label="Play again with the same players and settings"
-        >
-          <span aria-hidden="true">▶</span>
-          Play Again
-        </button>
-
-        {/* New Game — go to home / setup */}
-        <button
-          id="btn-new-game"
-          className="sb-btn sb-btn-secondary"
-          onClick={() => setScreen('home')}
-          aria-label="Start a new game with different settings"
-        >
-          <span aria-hidden="true">⚙️</span>
-          New Game
-        </button>
-
-        {/* Home — full reset */}
-        <button
-          id="btn-go-home"
-          className="sb-btn sb-btn-ghost"
-          onClick={resetGame}
-          aria-label="Return to the home screen"
-        >
-          <span aria-hidden="true">🏠</span>
-          Home
-        </button>
+        {isFinal ? (
+          <>
+            <button
+              id="btn-play-again"
+              className="sb-btn sb-btn-primary"
+              onClick={playAgain}
+              aria-label="Play again with the same players and settings"
+            >
+              <span aria-hidden="true">▶</span>
+              Play Again
+            </button>
+            <button
+              id="btn-go-home"
+              className="sb-btn sb-btn-ghost"
+              onClick={resetGame}
+              aria-label="Return to the home screen"
+            >
+              <span aria-hidden="true">🏠</span>
+              Home
+            </button>
+          </>
+        ) : (
+          <button
+            id="btn-next-round"
+            className="sb-btn sb-btn-primary"
+            onClick={startNextRound}
+            aria-label="Start the next round"
+          >
+            <span aria-hidden="true">▶</span>
+            Start Next Round
+          </button>
+        )}
       </footer>
 
     </main>

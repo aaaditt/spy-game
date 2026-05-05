@@ -365,82 +365,65 @@
   margin-top: var(--space-2);
 }
 
-/* ── CREWMATE card ── */
-.rr-card-crewmate {
+/* ── NEUTRAL card (shared by both crewmate and spy) ── */
+.rr-card-neutral {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(52, 211, 153, 0.35), transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.25), transparent 55%),
-    linear-gradient(160deg, #0d2b22 0%, #0a1f18 50%, #061411 100%);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+    radial-gradient(ellipse at 25% 20%, rgba(139, 92, 246, 0.18), transparent 55%),
+    radial-gradient(ellipse at 75% 80%, rgba(236, 72, 153, 0.12), transparent 55%),
+    linear-gradient(160deg, #141428 0%, #0e0e1f 50%, #0a0a18 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 0 0 1px rgba(52, 211, 153, 0.12) inset,
+    0 0 0 1px rgba(139, 92, 246, 0.08) inset,
     0 8px 40px rgba(0, 0, 0, 0.6),
-    0 0 60px rgba(52, 211, 153, 0.12);
+    0 0 60px rgba(139, 92, 246, 0.1);
 }
 
-.crewmate-badge {
-  background: rgba(52, 211, 153, 0.15);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #6ee7b7;
+/* Crewmate badge — blue tint */
+.rr-badge-crewmate {
+  background: rgba(99, 179, 237, 0.15);
+  border: 1px solid rgba(99, 179, 237, 0.4);
+  color: #90cdf4;
 }
 
-.crewmate-label {
+/* Spy badge — amber tint */
+.rr-badge-spy {
+  background: rgba(246, 173, 85, 0.15);
+  border: 1px solid rgba(246, 173, 85, 0.4);
+  color: #f6ad55;
+}
+
+/* Crewmate word display */
+.rr-card-role-label {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: rgba(110, 231, 183, 0.75);
+  color: rgba(200, 200, 230, 0.7);
   margin: 0;
 }
 
-.crewmate-word {
+.rr-card-word {
   font-size: clamp(1.8rem, 6vw, 2.6rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   color: #ffffff;
-  text-shadow:
-    0 0 20px rgba(52, 211, 153, 0.6),
-    0 2px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 2px 8px rgba(0, 0, 0, 0.5);
   margin: var(--space-1) 0;
   line-height: 1.1;
 }
 
-.rr-card-crewmate .rr-card-category-label { color: rgba(110, 231, 183, 0.6); }
-.rr-card-crewmate .rr-card-category-value { color: #a7f3d0; }
-.crewmate-tip { color: rgba(110, 231, 183, 0.65); }
-
-/* ── SPY card ── */
-.rr-card-spy {
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(239, 68, 68, 0.35), transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(185, 28, 28, 0.3), transparent 55%),
-    linear-gradient(160deg, #2a0a0a 0%, #1c0606 50%, #130404 100%);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  box-shadow:
-    0 0 0 1px rgba(239, 68, 68, 0.12) inset,
-    0 8px 40px rgba(0, 0, 0, 0.6),
-    0 0 60px rgba(239, 68, 68, 0.15);
-}
-
-.spy-badge {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
-}
-
+/* Spy title */
 .rr-card-spy-title {
   font-size: clamp(1.2rem, 4.5vw, 1.6rem);
   font-weight: 900;
   letter-spacing: -0.02em;
   color: #ffffff;
-  text-shadow:
-    0 0 24px rgba(239, 68, 68, 0.7),
-    0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 0 24px rgba(246, 173, 85, 0.6), 0 2px 8px rgba(0, 0, 0, 0.6);
   line-height: 1.1;
   margin-bottom: var(--space-2);
 }
 
 .rr-spy-hint-box {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(246, 173, 85, 0.08);
+  border: 1px solid rgba(246, 173, 85, 0.2);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
   max-width: 240px;
@@ -452,27 +435,25 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(252, 165, 165, 0.65);
+  color: rgba(246, 173, 85, 0.65);
   margin: 0 0 var(--space-1);
 }
 
 .rr-spy-hint-text {
   font-size: 0.875rem;
   font-style: italic;
-  color: #fecaca;
+  color: #fbd38d;
   line-height: 1.5;
   margin: 0;
 }
 
 .rr-spy-no-hint {
   font-size: 0.8125rem;
-  color: rgba(252, 165, 165, 0.6);
+  color: rgba(246, 173, 85, 0.6);
   font-style: italic;
   max-width: 200px;
   margin: 0;
 }
-
-.spy-tip { color: rgba(252, 165, 165, 0.6); }
 
 /* ═══════════════════════════════════════════════════════════════════
    CTA SECTION (below the card after reveal)

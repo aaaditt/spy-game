@@ -10,13 +10,14 @@ import './App.css'
 
 // Screens registered here are rendered by the store's `screen` key
 const SCREENS = {
-  home:    HomeScreen,
-  setup:   SetupScreen,
-  reveal:  RoleRevealScreen,
-  play:    DiscussionScreen,
-  vote:    VotingScreen,
-  results: ResultsScreen,
-  final:   ScoreboardScreen,
+  home:        HomeScreen,
+  setup:       SetupScreen,
+  reveal:      RoleRevealScreen,
+  play:        DiscussionScreen,
+  vote:        VotingScreen,
+  results:     ResultsScreen,
+  scoreboard:  ScoreboardScreen,
+  final:       ScoreboardScreen,
 }
 
 function App() {

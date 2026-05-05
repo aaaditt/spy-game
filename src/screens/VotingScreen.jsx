@@ -99,24 +99,27 @@ function PlayerGrid({ candidates, selectedId, onSelect }) {
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function VotingScreen() {
-  const players    = useGameStore((s) => s.players)
-  const votes      = useGameStore((s) => s.votes)
-  const castVote   = useGameStore((s) => s.castVote)
-  const tallyVotes = useGameStore((s) => s.tallyVotes)
+  const players        = useGameStore((s) => s.players)
+  const eliminatedIds  = useGameStore((s) => s.eliminatedIds)
+  const votes          = useGameStore((s) => s.votes)
+  const castVote       = useGameStore((s) => s.castVote)
+  const tallyVotes     = useGameStore((s) => s.tallyVotes)
 
-  // Index into players[] for who is currently voting
-  // Start at the first player who hasn't voted yet
-  const firstPending = players.findIndex((p) => !(p.id in votes))
+  // Only active (non-eliminated) players participate in voting
+  const activePlayers = players.filter((p) => !eliminatedIds.includes(p.id))
+
+  // Index into activePlayers[] for who is currently voting
+  const firstPending = activePlayers.findIndex((p) => !(p.id in votes))
   const [voterIndex, setVoterIndex] = useState(firstPending === -1 ? 0 : firstPending)
   const [phase, setPhase]           = useState('cover')   // 'cover' | 'voting'
   const [selectedId, setSelectedId] = useState(null)
 
-  const currentVoter = players[voterIndex] ?? null
+  const currentVoter = activePlayers[voterIndex] ?? null
   const votedCount   = Object.keys(votes).length
-  const totalVoters  = players.length
+  const totalVoters  = activePlayers.length
 
-  // Players this voter can vote for (everyone except themselves)
-  const candidates = players.filter((p) => p.id !== currentVoter?.id)
+  // Players this voter can vote for (everyone active except themselves)
+  const candidates = activePlayers.filter((p) => p.id !== currentVoter?.id)
 
   // Guard — shouldn't render without a valid voter
   if (!currentVoter) return null
@@ -141,12 +144,12 @@ export default function VotingScreen() {
       return
     }
 
-    // Advance to next voter
-    const nextIndex = players.findIndex(
+    // Advance to next active voter who hasn't voted yet
+    const nextIndex = activePlayers.findIndex(
       (p, idx) => idx > voterIndex && !(p.id in votes) && p.id !== currentVoter.id
     )
     const safeNext = nextIndex === -1
-      ? players.findIndex((p) => !(p.id in votes) && p.id !== currentVoter.id)
+      ? activePlayers.findIndex((p) => !(p.id in votes) && p.id !== currentVoter.id)
       : nextIndex
 
     if (safeNext !== -1) {
@@ -223,13 +226,13 @@ export default function VotingScreen() {
           onClick={handleConfirm}
           disabled={!selectedId}
           aria-label={selectedId
-            ? `Confirm vote for ${players.find((p) => p.id === selectedId)?.name}`
+            ? `Confirm vote for ${activePlayers.find((p) => p.id === selectedId)?.name}`
             : 'Select a player first'}
         >
           {selectedId ? (
             <>
               <span>✓</span>
-              Vote for {players.find((p) => p.id === selectedId)?.name}
+              Vote for {activePlayers.find((p) => p.id === selectedId)?.name}
             </>
           ) : (
             <>

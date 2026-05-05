@@ -7,18 +7,15 @@ import './RoleRevealScreen.css'
 function CoverScreen({ playerName, onReveal }) {
   return (
     <div className="rr-cover animate-fade-in">
-      {/* Ambient orbs */}
       <div className="rr-cover-bg" aria-hidden="true">
         <div className="rr-cover-orb rr-cover-orb-1" />
         <div className="rr-cover-orb rr-cover-orb-2" />
       </div>
-
       <div className="rr-cover-content">
         <div className="rr-cover-icon">🔒</div>
         <p className="rr-cover-label">Pass the phone to</p>
         <h2 className="rr-cover-name">{playerName}</h2>
         <p className="rr-cover-hint">Make sure nobody else is looking</p>
-
         <button
           id="btn-tap-to-reveal"
           className="rr-reveal-btn"
@@ -35,26 +32,20 @@ function CoverScreen({ playerName, onReveal }) {
 
 function CrewmateCard({ secretWord, category }) {
   return (
-    <div className="rr-card rr-card-crewmate">
-      {/* Shine overlay */}
+    <div className="rr-card rr-card-neutral">
       <div className="rr-card-shine" aria-hidden="true" />
-
       <div className="rr-card-body">
-        <div className="rr-card-badge crewmate-badge">CREWMATE</div>
-
-        <div className="rr-card-role-icon crewmate-icon">🛡️</div>
-
-        <p className="rr-card-role-label crewmate-label">Your Secret Word</p>
-        <h2 className="rr-card-word crewmate-word">{secretWord}</h2>
-
+        <div className="rr-card-badge rr-badge-crewmate">CREWMATE</div>
+        <div className="rr-card-role-icon">🛡️</div>
+        <p className="rr-card-role-label">Your Secret Word</p>
+        <h2 className="rr-card-word">{secretWord}</h2>
         {category && (
-          <div className="rr-card-category crewmate-category">
+          <div className="rr-card-category">
             <span className="rr-card-category-label">Category</span>
             <span className="rr-card-category-value">{category}</span>
           </div>
         )}
-
-        <p className="rr-card-tip crewmate-tip">
+        <p className="rr-card-tip">
           Discuss but don't reveal the exact word — a Spy is listening!
         </p>
       </div>
@@ -64,17 +55,12 @@ function CrewmateCard({ secretWord, category }) {
 
 function SpyCard({ spyHint }) {
   return (
-    <div className="rr-card rr-card-spy">
-      {/* Shine overlay */}
+    <div className="rr-card rr-card-neutral">
       <div className="rr-card-shine" aria-hidden="true" />
-
       <div className="rr-card-body">
-        <div className="rr-card-badge spy-badge">SPY</div>
-
-        <div className="rr-card-role-icon spy-icon">💀</div>
-
+        <div className="rr-card-badge rr-badge-spy">SPY</div>
+        <div className="rr-card-role-icon">🕵️</div>
         <h2 className="rr-card-spy-title">YOU ARE THE SPY</h2>
-
         {spyHint ? (
           <div className="rr-spy-hint-box">
             <p className="rr-spy-hint-label">Your Clue</p>
@@ -83,16 +69,13 @@ function SpyCard({ spyHint }) {
         ) : (
           <p className="rr-spy-no-hint">No hint — fly blind, trust your instincts.</p>
         )}
-
-        <p className="rr-card-tip spy-tip">
+        <p className="rr-card-tip">
           Blend in, ask clever questions, and figure out the secret word.
         </p>
       </div>
     </div>
   )
 }
-
-// ── Progress Bar ──────────────────────────────────────────────────────────────
 
 function ProgressDots({ total, current }) {
   return (
@@ -110,7 +93,7 @@ function ProgressDots({ total, current }) {
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function RoleRevealScreen() {
-  const players            = useGameStore((s) => s.players)
+  const revealOrder        = useGameStore((s) => s.revealOrder)
   const currentRevealIndex = useGameStore((s) => s.currentRevealIndex)
   const secretWord         = useGameStore((s) => s.secretWord)
   const spyHint            = useGameStore((s) => s.spyHint)
@@ -118,10 +101,9 @@ export default function RoleRevealScreen() {
 
   const [phase, setPhase] = useState('cover')   // 'cover' | 'flipping' | 'revealed'
 
-  const currentPlayer = players[currentRevealIndex] ?? null
-  const isLastPlayer  = currentRevealIndex >= players.length - 1
+  const currentPlayer = revealOrder[currentRevealIndex] ?? null
+  const isLastPlayer  = currentRevealIndex >= revealOrder.length - 1
 
-  // Derive category label from secretWord using the imported WORD_BANK
   const categoryLabel = (() => {
     if (!secretWord) return null
     for (const [, cat] of Object.entries(WORD_BANK)) {
@@ -130,12 +112,11 @@ export default function RoleRevealScreen() {
     return null
   })()
 
-  // Guard: shouldn't render without a current player
   if (!currentPlayer) return null
 
   function handleReveal() {
     setPhase('flipping')
-    setTimeout(() => setPhase('revealed'), 680)  // match CSS animation duration
+    setTimeout(() => setPhase('revealed'), 680)
   }
 
   function handleGotIt() {
@@ -145,36 +126,25 @@ export default function RoleRevealScreen() {
 
   return (
     <main className="rr-screen">
-
-      {/* ── Persistent progress indicator ── */}
       <div className="rr-header">
         <span className="rr-header-label">Role Reveal</span>
-        <ProgressDots total={players.length} current={currentRevealIndex} />
-        <span className="rr-header-count">{currentRevealIndex + 1} / {players.length}</span>
+        <ProgressDots total={revealOrder.length} current={currentRevealIndex} />
+        <span className="rr-header-count">{currentRevealIndex + 1} / {revealOrder.length}</span>
       </div>
 
-      {/* ── Phase: Cover ── */}
       {phase === 'cover' && (
-        <CoverScreen
-          playerName={currentPlayer.name}
-          onReveal={handleReveal}
-        />
+        <CoverScreen playerName={currentPlayer.name} onReveal={handleReveal} />
       )}
 
-      {/* ── Phase: Flipping / Revealed ── */}
       {(phase === 'flipping' || phase === 'revealed') && (
         <div className="rr-card-area animate-fade-in">
-          {/* 3D Flip wrapper */}
           <div className={`rr-flip-scene ${phase === 'revealed' ? 'rr-flip-scene-done' : ''}`}>
             <div className="rr-flip-inner">
-              {/* Front: generic card back texture */}
               <div className="rr-flip-front">
                 <div className="rr-flip-front-inner">
                   <span className="rr-flip-front-icon">❓</span>
                 </div>
               </div>
-
-              {/* Back: the actual role card */}
               <div className="rr-flip-back">
                 {currentPlayer.role === 'spy' ? (
                   <SpyCard spyHint={spyHint} />
@@ -185,7 +155,6 @@ export default function RoleRevealScreen() {
             </div>
           </div>
 
-          {/* ── CTA below card ── */}
           {phase === 'revealed' && (
             <div className="rr-cta animate-slide-up">
               <p className="rr-cta-player-name">{currentPlayer.name}</p>

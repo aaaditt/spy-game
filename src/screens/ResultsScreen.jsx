@@ -283,9 +283,9 @@ export default function ResultsScreen() {
   const roundResults = useGameStore((s) => s.roundResults)
   const secretWord = useGameStore((s) => s.secretWord)
   const currentRound = useGameStore((s) => s.currentRound)
-  const settings = useGameStore((s) => s.settings)
   const nextRound = useGameStore((s) => s.nextRound)
   const spyGuessFn = useGameStore((s) => s.spyGuess)
+  const winner = useGameStore((s) => s.winner)
 
   // The latest round result (tallyVotes pushes to roundResults before navigating)
   const latestResult = roundResults[roundResults.length - 1] ?? null
@@ -302,7 +302,6 @@ export default function ResultsScreen() {
   const [revealDone, setRevealDone] = useState(false)
 
   const tallyMap = buildTallyMap(players, votes)
-  const isLastRound = currentRound >= settings.rounds
 
   // When spy reveal fires the callback, we may show the spy guess input
   function handleSpyGuessPhase() {
@@ -423,27 +422,15 @@ export default function ResultsScreen() {
       {/* ── Footer CTA ── */}
       {revealDone && (
         <footer className="rs-footer animate-slide-up">
-          {isLastRound ? (
-            <button
-              id="btn-view-final-scores"
-              className="rs-cta-btn rs-cta-btn-final"
-              onClick={nextRound}
-              aria-label="View final scores"
-            >
-              <span>🏆</span>
-              View Final Scores
-            </button>
-          ) : (
-            <button
-              id="btn-next-round"
-              className="rs-cta-btn rs-cta-btn-next"
-              onClick={nextRound}
-              aria-label={`Start round ${currentRound + 1}`}
-            >
-              <span>▶</span>
-              Next Round
-            </button>
-          )}
+          <button
+            id="btn-next-round"
+            className={`rs-cta-btn ${winner ? 'rs-cta-btn-final' : 'rs-cta-btn-next'}`}
+            onClick={nextRound}
+            aria-label={winner ? 'View scores' : `Start round ${currentRound + 1}`}
+          >
+            <span>{winner ? '🏆' : '▶'}</span>
+            {winner ? 'View Scores' : 'Next Round'}
+          </button>
         </footer>
       )}
 

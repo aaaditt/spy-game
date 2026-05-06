@@ -154,7 +154,7 @@
 
 /* ── Winner card ── glowing border + pulsing shadow */
 .sb-card-winner {
-  border-color: rgba(139, 92, 246, 0.5) !important;
+  border-color: rgba(139, 92, 246, 0.5);
   box-shadow:
     0 0 0 1px rgba(139, 92, 246, 0.5),
     0 0 40px rgba(139, 92, 246, 0.25),
@@ -163,8 +163,9 @@
     135deg,
     rgba(139, 92, 246, 0.12),
     rgba(236, 72, 153, 0.08)
-  ) !important;
+  );
   animation: winnerGlow 2.5s ease-in-out infinite;
+  will-change: box-shadow;
 }
 
 @keyframes winnerGlow {

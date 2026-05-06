@@ -1,15 +1,5 @@
 /* ─── DiscussionScreen ───────────────────────────────────────────── */
 
-/* Slide-down animation for header */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-slide-down {
-  animation: slideDown var(--transition-slow) both;
-}
-
 /* CTA glow-pulse when timer has expired */
 @keyframes ctaPulse {
   0%, 100% {

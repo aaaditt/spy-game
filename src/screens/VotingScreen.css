@@ -330,6 +330,7 @@
 
 .vs-player-card-selected {
   animation: selectedPulse 1.5s ease-in-out infinite;
+  will-change: box-shadow;
 }
 
 @keyframes selectedPulse {

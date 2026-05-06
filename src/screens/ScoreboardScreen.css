@@ -154,31 +154,22 @@
 
 /* ── Winner card ── glowing border + pulsing shadow */
 .sb-card-winner {
-  border-color: rgba(245, 158, 11, 0.55);
-  background: rgba(20, 15, 5, 0.7);
+  border-color: rgba(139, 92, 246, 0.5) !important;
   box-shadow:
-    0 0 0 1px rgba(245, 158, 11, 0.2),
-    0 0 24px rgba(245, 158, 11, 0.2),
-    0 0 60px rgba(245, 158, 11, 0.1),
-    var(--shadow-md);
-  animation: pulseWinnerGlow 2.8s ease-in-out infinite;
+    0 0 0 1px rgba(139, 92, 246, 0.5),
+    0 0 40px rgba(139, 92, 246, 0.25),
+    0 8px 30px rgba(0,0,0,0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.12),
+    rgba(236, 72, 153, 0.08)
+  ) !important;
+  animation: winnerGlow 2.5s ease-in-out infinite;
 }
 
-@keyframes pulseWinnerGlow {
-  0%, 100% {
-    box-shadow:
-      0 0 0 1px rgba(245, 158, 11, 0.2),
-      0 0 24px rgba(245, 158, 11, 0.2),
-      0 0 60px rgba(245, 158, 11, 0.1),
-      var(--shadow-md);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(245, 158, 11, 0.4),
-      0 0 40px rgba(245, 158, 11, 0.35),
-      0 0 80px rgba(245, 158, 11, 0.2),
-      var(--shadow-lg);
-  }
+@keyframes winnerGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(139,92,246,0.5), 0 0 40px rgba(139,92,246,0.25), 0 8px 30px rgba(0,0,0,0.5); }
+  50%       { box-shadow: 0 0 0 2px rgba(168,85,247,0.8), 0 0 70px rgba(139,92,246,0.45), 0 8px 30px rgba(0,0,0,0.5); }
 }
 
 /* ── Rank badge ── */
@@ -300,7 +291,12 @@
 }
 
 .sb-score-num-winner {
-  color: #f59e0b;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .sb-score-label {

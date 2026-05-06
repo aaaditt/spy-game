@@ -183,20 +183,26 @@ export const useGameStore = create((set, get) => ({
     const eliminatedSet = new Set(eliminatedIds)
     const activePlayers = players.filter(p => !eliminatedSet.has(p.id))
 
-    // Build tally
+    // Build tally map: playerId → vote count
     const tally = {}
     for (const targetId of Object.values(votes)) {
       tally[targetId] = (tally[targetId] ?? 0) + 1
     }
+
     const maxVotes = Object.values(tally).length
       ? Math.max(...Object.values(tally))
       : 0
     const topIds = Object.keys(tally).filter(id => tally[id] === maxVotes)
-    const votedOutId = topIds[Math.floor(Math.random() * topIds.length)] ?? null
-    const votedOut = activePlayers.find(p => p.id === votedOutId) ?? null
+
+    // TIE: more than one player shares the top vote count → nobody eliminated
+    const isTie = topIds.length > 1
+    const votedOutId = isTie ? null : (topIds[0] ?? null)
+    const votedOut = votedOutId
+      ? (activePlayers.find(p => p.id === votedOutId) ?? null)
+      : null
     const spyVotedOut = votedOut?.role === 'spy'
 
-    // Update eliminated list
+    // Compute post-vote remaining players
     const newEliminatedIds = votedOutId
       ? [...eliminatedIds, votedOutId]
       : [...eliminatedIds]
@@ -205,17 +211,17 @@ export const useGameStore = create((set, get) => ({
     const remainingSpies = remainingPlayers.filter(p => p.role === 'spy')
     const remainingInnocents = remainingPlayers.filter(p => p.role === 'innocent')
 
-    // Win condition check (spy guess handled separately)
-    // Spy wins immediately if no innocents remain
+    // Win conditions:
+    // Spies outnumber or equal crewmates → spies win (crewmates can never form majority)
     let winner = null
-    if (remainingSpies.length > 0 && remainingInnocents.length === 0) {
+    if (remainingSpies.length > 0 && remainingSpies.length >= remainingInnocents.length) {
       winner = 'spy'
     }
 
-    // Award points
+    // Award points (only when someone was eliminated)
     const updatedPlayers = players.map(p => {
       if (spyVotedOut && p.role === 'innocent') return { ...p, score: p.score + 2 }
-      if (!spyVotedOut && p.role === 'spy') return { ...p, score: p.score + 2 }
+      if (!spyVotedOut && !isTie && p.role === 'spy') return { ...p, score: p.score + 2 }
       return p
     })
 
@@ -224,7 +230,7 @@ export const useGameStore = create((set, get) => ({
       eliminatedIds: newEliminatedIds,
       roundResults: [
         ...state.roundResults,
-        { round: currentRound, type: 'vote', votedOut, spyVotedOut, winner },
+        { round: currentRound, type: 'vote', votedOut, spyVotedOut, isTie, winner },
       ],
       winner,
       screen: 'results',
@@ -306,6 +312,21 @@ export const useGameStore = create((set, get) => ({
       votes: {},
       winner: null,
       screen: 'reveal',
+    })
+  },
+
+  // Called when a tie vote occurred — restart voting with same word, same players
+  continueTiedRound: () => {
+    const { players, eliminatedIds, sessionIndex, currentRound } = get()
+    const eliminatedSet = new Set(eliminatedIds)
+    const startIdx = (sessionIndex + currentRound) % players.length
+    const revealOrder = buildRevealOrder(players, eliminatedSet, startIdx)
+
+    set({
+      revealOrder,
+      currentRevealIndex: 0,
+      votes: {},
+      screen: 'vote',
     })
   },
 

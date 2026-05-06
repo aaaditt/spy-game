@@ -284,6 +284,7 @@ export default function ResultsScreen() {
   const secretWord = useGameStore((s) => s.secretWord)
   const currentRound = useGameStore((s) => s.currentRound)
   const nextRound = useGameStore((s) => s.nextRound)
+  const continueTiedRound = useGameStore((s) => s.continueTiedRound)
   const spyGuessFn = useGameStore((s) => s.spyGuess)
   const winner = useGameStore((s) => s.winner)
 
@@ -310,13 +311,14 @@ export default function ResultsScreen() {
     setTimeout(() => setRevealDone(true), 800)
   }
 
-  // When spy is NOT caught, we just mark reveal done after delay
+  // When spy is NOT caught OR it's a tie, mark reveal done after delay
   useEffect(() => {
     if (!spyVotedOut) {
-      const t = setTimeout(() => setRevealDone(true), 3200)
+      const delay = latestResult?.isTie ? 800 : 3200
+      const t = setTimeout(() => setRevealDone(true), delay)
       return () => clearTimeout(t)
     }
-  }, [spyVotedOut])
+  }, [spyVotedOut, latestResult?.isTie])
 
   // When a spy guess is submitted, mark reveal done to show scoreboard
   // (store sets screen:'results' again which triggers re-render with updated players)
@@ -362,19 +364,29 @@ export default function ResultsScreen() {
           />
         </section>
 
-        {/* 2. Voted-out reveal */}
+        {/* 2. Voted-out reveal or tie banner */}
         <section className="rs-section" aria-label="Voted out player">
-          <VotedOutBanner player={votedOut} />
+          {latestResult?.isTie ? (
+            <div className="rs-tie-banner animate-scale-in" role="status">
+              <span className="rs-tie-icon">⚖️</span>
+              <h3 className="rs-tie-title">It's a Tie!</h3>
+              <p className="rs-tie-msg">No one was voted out — the discussion continues.</p>
+            </div>
+          ) : (
+            <VotedOutBanner player={votedOut} />
+          )}
         </section>
 
-        {/* 3. Spy reveal (suspense + verdict) */}
-        <section className="rs-section" aria-label="Spy verdict">
-          <SpyReveal
-            spyVotedOut={spyVotedOut}
-            votedOut={votedOut}
-            onSpyGuessPhase={handleSpyGuessPhase}
-          />
-        </section>
+        {/* 3. Spy reveal — only shown when someone was actually voted out */}
+        {!latestResult?.isTie && (
+          <section className="rs-section" aria-label="Spy verdict">
+            <SpyReveal
+              spyVotedOut={spyVotedOut}
+              votedOut={votedOut}
+              onSpyGuessPhase={handleSpyGuessPhase}
+            />
+          </section>
+        )}
 
         {/* 4. Spy guess input — only if spy was caught and hasn't guessed yet */}
         {showSpyGuess && !spyAlreadyGuessed && (
@@ -425,11 +437,11 @@ export default function ResultsScreen() {
           <button
             id="btn-next-round"
             className={`rs-cta-btn ${winner ? 'rs-cta-btn-final' : 'rs-cta-btn-next'}`}
-            onClick={nextRound}
-            aria-label={winner ? 'View scores' : `Start round ${currentRound + 1}`}
+            onClick={latestResult?.isTie ? continueTiedRound : nextRound}
+            aria-label={winner ? 'View scores' : latestResult?.isTie ? 'Continue discussion' : `Start round ${currentRound + 1}`}
           >
-            <span>{winner ? '🏆' : '▶'}</span>
-            {winner ? 'View Scores' : 'Next Round'}
+            <span>{winner ? '🏆' : latestResult?.isTie ? '🔄' : '▶'}</span>
+            {winner ? 'View Scores' : latestResult?.isTie ? 'Continue' : 'Next Round'}
           </button>
         </footer>
       )}

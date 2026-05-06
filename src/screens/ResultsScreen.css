@@ -754,3 +754,33 @@
   .rs-body { padding-inline: var(--space-8); }
   .rs-footer { padding-inline: var(--space-8); }
 }
+
+/* ─── Tie Banner ─────────────────────────────────────────────────── */
+.rs-tie-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-8);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.06));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.rs-tie-icon {
+  font-size: 2.5rem;
+}
+
+.rs-tie-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #fbbf24;
+  margin: 0;
+}
+
+.rs-tie-msg {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  max-width: 260px;
+}

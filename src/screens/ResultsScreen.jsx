@@ -437,7 +437,7 @@ export default function ResultsScreen() {
           <button
             id="btn-next-round"
             className={`rs-cta-btn ${winner ? 'rs-cta-btn-final' : 'rs-cta-btn-next'}`}
-            onClick={latestResult?.isTie ? continueTiedRound : nextRound}
+            onClick={winner ? nextRound : latestResult?.isTie ? continueTiedRound : nextRound}
             aria-label={winner ? 'View scores' : latestResult?.isTie ? 'Continue discussion' : `Start round ${currentRound + 1}`}
           >
             <span>{winner ? '🏆' : latestResult?.isTie ? '🔄' : '▶'}</span>

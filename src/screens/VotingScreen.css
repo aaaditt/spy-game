@@ -292,7 +292,6 @@
   cursor: pointer;
   transition:
     transform var(--transition-spring),
-    background var(--transition-base),
     border-color var(--transition-base),
     box-shadow var(--transition-base);
   font-family: var(--font-sans);
@@ -322,6 +321,21 @@
 
 .vs-player-card:hover::before { opacity: 1; }
 .vs-player-card:active { transform: scale(0.97); }
+
+.vs-player-card:hover:not(.vs-player-card-selected) {
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.vs-player-card-selected {
+  animation: selectedPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes selectedPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.6), 0 0 20px rgba(139, 92, 246, 0.3); }
+  50%       { box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.9), 0 0 40px rgba(139, 92, 246, 0.5); }
+}
 
 /* Selected state */
 .vs-player-card-selected {

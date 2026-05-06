@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800;900&display=swap');
 
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 :root {
@@ -50,6 +50,15 @@
   /* Typography */
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --font-display: 'Syne', system-ui, sans-serif;
+
+  /* Richer accent tones */
+  --color-accent-4:     #06b6d4; /* cyan accent for secondary highlights */
+  --color-accent-warn:  #f59e0b; /* amber for spy/warn states */
+
+  /* Stronger glow variants */
+  --shadow-glow-md: 0 0 40px var(--color-accent-glow), 0 0 16px var(--color-accent-glow-sm);
+  --shadow-glow-lg: 0 0 80px rgba(139, 92, 246, 0.5), 0 0 30px rgba(236, 72, 153, 0.3);
 
   /* Spacing scale */
   --space-1:  4px;
@@ -117,9 +126,10 @@ body {
 /* ─── Typography ─────────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-strong);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
 
 h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
@@ -442,6 +452,18 @@ code, kbd, samp {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-8px); }
 }
+
+@keyframes scanline {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 4px; }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50%       { transform: scale(1.08); opacity: 0.45; }
+}
+
+.animate-slide-down { animation: slideDown var(--transition-slow) both; }
 
 /* ─── Animation utility classes ──────────────────────────────────── */
 .animate-fade-in  { animation: fadeIn  var(--transition-slow) both; }

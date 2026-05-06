@@ -230,51 +230,6 @@ function SpyGuessInput({ secretWord, spyGuess }) {
   )
 }
 
-/**
- * Score leaderboard — shown after results are fully revealed.
- */
-function ScoreBoard({ players }) {
-  const sorted = [...players].sort((a, b) => b.score - a.score)
-  const maxScore = sorted[0]?.score ?? 0
-
-  return (
-    <section className="rs-scores" aria-label="Current scores">
-      <h3 className="rs-scores-title">Scores</h3>
-      <div className="rs-scores-list" role="list">
-        {sorted.map((player, i) => {
-          const initials = player.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
-          const pct = maxScore > 0 ? (player.score / maxScore) * 100 : 0
-          const medal = i === 0 && player.score > 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
-
-          return (
-            <div
-              key={player.id}
-              className={`rs-score-row animate-fade-in ${i === 0 && player.score > 0 ? 'rs-score-row-leader' : ''}`}
-              style={{ animationDelay: `${i * 60}ms` }}
-              role="listitem"
-            >
-              <span className="rs-score-rank">{medal ?? `${i + 1}`}</span>
-              <div className="rs-score-avatar">{initials}</div>
-              <div className="rs-score-info">
-                <span className="rs-score-name">{player.name}</span>
-                <div className="rs-score-track">
-                  <div
-                    className={`rs-score-bar ${i === 0 && player.score > 0 ? 'rs-score-bar-leader' : ''}`}
-                    style={{ width: `${Math.max(pct, player.score > 0 ? 5 : 0)}%` }}
-                  />
-                </div>
-              </div>
-              <span className="rs-score-pts">
-                {player.score} <span className="rs-score-pts-label">pts</span>
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    </section>
-  )
-}
-
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function ResultsScreen() {
@@ -307,7 +262,6 @@ export default function ResultsScreen() {
   // When spy reveal fires the callback, we may show the spy guess input
   function handleSpyGuessPhase() {
     if (!spyAlreadyGuessed) setShowSpyGuess(true)
-    // Also mark reveal done after a moment so the scoreboard appears
     setTimeout(() => setRevealDone(true), 800)
   }
 
@@ -320,7 +274,7 @@ export default function ResultsScreen() {
     }
   }, [spyVotedOut, latestResult?.isTie])
 
-  // When a spy guess is submitted, mark reveal done to show scoreboard
+  // When a spy guess is submitted, mark reveal done to show the CTA
   // (store sets screen:'results' again which triggers re-render with updated players)
   useEffect(() => {
     if (showSpyGuess && spyAlreadyGuessed) {
@@ -418,13 +372,6 @@ export default function ResultsScreen() {
               </>
             )}
           </div>
-        )}
-
-        {/* 5. Scoreboard — revealed after spy verdict */}
-        {revealDone && (
-          <section className="rs-section animate-slide-up" aria-label="Score update">
-            <ScoreBoard players={players} />
-          </section>
         )}
 
         {/* Spacer so footer doesn't cover content */}

@@ -114,6 +114,7 @@ export default function ScoreboardScreen() {
   const playAgain      = useGameStore((s) => s.playAgain)
   const resetGame      = useGameStore((s) => s.resetGame)
   const startNextRound = useGameStore((s) => s.startNextRound)
+  const setScreen      = useGameStore((s) => s.setScreen)
 
   const isFinal = screen === 'final'
   const sorted = [...players].sort((a, b) => b.score - a.score)
@@ -193,6 +194,15 @@ export default function ScoreboardScreen() {
             >
               <span aria-hidden="true">▶</span>
               Play Again
+            </button>
+            <button
+              id="btn-edit-settings"
+              className="sb-btn sb-btn-secondary"
+              onClick={() => setScreen('setup')}
+              aria-label="Edit players and settings before playing again"
+            >
+              <span aria-hidden="true">⚙️</span>
+              Edit Settings
             </button>
             <button
               id="btn-go-home"

@@ -218,12 +218,12 @@ export const useGameStore = create((set, get) => ({
       winner = 'spy'
     }
 
-    // Award points (only when someone was eliminated)
-    const updatedPlayers = players.map(p => {
-      if (spyVotedOut && p.role === 'innocent') return { ...p, score: p.score + 2 }
-      if (!spyVotedOut && !isTie && p.role === 'spy') return { ...p, score: p.score + 2 }
-      return p
-    })
+    // Award points only when spy is caught (crewmates win this vote)
+    // Mid-game innocent eliminations give no points — revealing who gains
+    // would expose the spy's identity before the game ends.
+    const updatedPlayers = spyVotedOut
+      ? players.map(p => p.role === 'innocent' ? { ...p, score: p.score + 2 } : p)
+      : players
 
     set(state => ({
       players: updatedPlayers,
@@ -264,14 +264,38 @@ export const useGameStore = create((set, get) => ({
     return correct
   },
 
-  // Called from ResultsScreen CTA — routes to mid-round scoreboard or final
+  // Called from ResultsScreen CTA — routes appropriately based on round outcome
   nextRound: () => {
-    const { winner } = get()
+    const { winner, roundResults } = get()
     if (winner) {
       set({ screen: 'final' })
+      return
+    }
+    const latest = roundResults[roundResults.length - 1] ?? null
+    const spyVotedOut = latest?.spyVotedOut ?? false
+    const isTie = latest?.isTie ?? false
+    if (!spyVotedOut && !isTie) {
+      // Innocent eliminated — continue same round, same word, same spy
+      get().continueAfterElimination()
     } else {
+      // Spy caught (word-guess phase done) or tie resolved — go to scoreboard
       set({ screen: 'scoreboard' })
     }
+  },
+
+  // Continue the hunt after an innocent is voted out — keeps same word/spy/round
+  continueAfterElimination: () => {
+    const { players, eliminatedIds, sessionIndex, currentRound } = get()
+    const eliminatedSet = new Set(eliminatedIds)
+    const startIdx = (sessionIndex + currentRound) % players.length
+    const revealOrder = buildRevealOrder(players, eliminatedSet, startIdx)
+
+    set({
+      revealOrder,
+      currentRevealIndex: 0,
+      votes: {},
+      screen: 'play',
+    })
   },
 
   // Called from mid-round ScoreboardScreen to start the next round

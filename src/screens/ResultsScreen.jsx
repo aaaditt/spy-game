@@ -381,15 +381,49 @@ export default function ResultsScreen() {
       {/* ── Footer CTA ── */}
       {revealDone && (
         <footer className="rs-footer animate-slide-up">
-          <button
-            id="btn-next-round"
-            className={`rs-cta-btn ${winner ? 'rs-cta-btn-final' : 'rs-cta-btn-next'}`}
-            onClick={winner ? nextRound : latestResult?.isTie ? continueTiedRound : nextRound}
-            aria-label={winner ? 'View scores' : latestResult?.isTie ? 'Continue discussion' : `Start round ${currentRound + 1}`}
-          >
-            <span>{winner ? '🏆' : latestResult?.isTie ? '🔄' : '▶'}</span>
-            {winner ? 'View Scores' : latestResult?.isTie ? 'Continue' : 'Next Round'}
-          </button>
+          {(() => {
+            const isTie = latestResult?.isTie ?? false
+            const spyCaught = latestResult?.spyVotedOut ?? false
+            const innocentOut = !winner && !isTie && !spyCaught
+
+            const label = winner
+              ? 'View Scores'
+              : isTie
+                ? 'Continue'
+                : innocentOut
+                  ? 'Continue Hunt'
+                  : 'View Scores'
+
+            const icon = winner
+              ? '🏆'
+              : isTie
+                ? '🔄'
+                : innocentOut
+                  ? '🔍'
+                  : '🏆'
+
+            const ariaLabel = winner
+              ? 'View final scores'
+              : isTie
+                ? 'Continue discussion'
+                : innocentOut
+                  ? 'Continue hunting the spy'
+                  : 'View scores'
+
+            const handleClick = isTie ? continueTiedRound : nextRound
+
+            return (
+              <button
+                id="btn-next-round"
+                className={`rs-cta-btn ${winner || (!isTie && spyCaught) ? 'rs-cta-btn-final' : 'rs-cta-btn-next'}`}
+                onClick={handleClick}
+                aria-label={ariaLabel}
+              >
+                <span>{icon}</span>
+                {label}
+              </button>
+            )
+          })()}
         </footer>
       )}
 
